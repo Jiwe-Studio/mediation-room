@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Mediation Room — Prototype</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ===================== SCREEN 0 — Disclaimer / Entry ===================== -->
+<section id="screen-0" class="screen active" tabindex="-1">
+  <div class="wrap">
+    <h1>The Mediation Room</h1>
+    <p class="subtitle">A prototype from Donkosira × Jiwe Games for Thought × SOAS × Code for Africa</p>
+
+    <div class="disclaimer-box">
+      <p><strong>This is a prototype.</strong> All testimony you'll read here is synthetic — written for this demo, not a real person's words. It exists to help you understand how testimony changes as it becomes public, not to let you "talk to a survivor."</p>
+      <p>You are not here to talk to a victim. You are here to understand what can be preserved, what must be protected, and what may be lost when testimony becomes public.</p>
+      <button class="btn-link" id="methodology-toggle-0" aria-expanded="false">Read the full methodology note ▾</button>
+      <div class="methodology-note-inline" id="methodology-note-0">
+        This prototype uses synthetic testimony created for demonstration purposes only. It is not a simulation of a real survivor, a replacement for testimony or human facilitation, or an oracle of historical truth. Its purpose is to test the interaction model, ethical boundaries, refusal rules, and mediation labels before any real testimony is ever involved. Built by Jiwe Games for Thought with Donkosira, SOAS (Marie Rodet), and Code for Africa's AI Sandbox fellowship.
+      </div>
+    </div>
+
+    <button class="btn-primary" id="enter-btn">Enter</button>
+  </div>
+</section>
+
+<!-- ===================== SCREEN 1 — Public Archive Summary ===================== -->
+<section id="screen-1" class="screen" tabindex="-1">
+  <div class="layer-indicator" aria-label="Layers of mediation between you and the original lived experience">
+    <span class="layer" data-layer="lived">Lived experience</span>
+    <span class="arrow">→</span>
+    <span class="layer" data-layer="memory">Memory &amp; narration</span>
+    <span class="arrow">→</span>
+    <span class="layer" data-layer="research">Research mediation</span>
+    <span class="arrow">→</span>
+    <span class="layer" data-layer="ai">AI mediation</span>
+  </div>
+  <div class="wrap">
+    <h2>Public Archive Summary</h2>
+    <div class="archive-summary" id="archive-summary-text">
+      In some communities, inherited social status has shaped people's access to land, work, marriage, social participation, and public recognition. These histories are often difficult to document because many people avoid speaking openly about them. Silence may protect individuals from stigma, but it can also make the harm harder to understand, remember, or challenge.
+    </div>
+    <p class="prompt-line">This summary is accurate but incomplete.<br />What is missing when lived experience is reduced to a public record?</p>
+    <button class="btn-primary" id="enter-room-btn">Enter the Mediation Room</button>
+  </div>
+  <footer class="site-footer">
+    <button class="btn-link open-methodology">About this prototype / methodology note</button>
+  </footer>
+</section>
+
+<!-- ===================== SCREEN 2 — The Mediation Room (chat) ===================== -->
+<section id="screen-2" class="screen" tabindex="-1" style="min-height:100vh;">
+  <div class="layer-indicator" aria-label="Layers of mediation between you and the original lived experience">
+    <span class="layer" data-layer="lived">Lived experience</span>
+    <span class="arrow">→</span>
+    <span class="layer" data-layer="memory">Memory &amp; narration</span>
+    <span class="arrow">→</span>
+    <span class="layer" data-layer="research">Research mediation</span>
+    <span class="arrow">→</span>
+    <span class="layer" data-layer="ai">AI mediation</span>
+  </div>
+
+  <div class="chat-header">
+    <h2 style="margin-bottom:0.2rem;">The Mediation Room</h2>
+    <p class="subtitle" style="margin-top:0;">Ask a question, or choose one below. Some questions will be refused on purpose — that's part of the point.</p>
+  </div>
+
+  <div class="starter-questions">
+    <div class="label">Starter questions</div>
+    <div class="chip-row" id="starter-chip-row"></div>
+  </div>
+
+  <div class="chat-log" id="chat-log" aria-live="polite"></div>
+
+  <div class="reflect-btn-wrap" id="reflect-btn-wrap">
+    <button type="button" id="reflect-btn">I'm ready to reflect →</button>
+  </div>
+
+  <form class="input-row" id="chat-form">
+    <label class="visually-hidden" for="chat-input">Ask a question</label>
+    <input type="text" id="chat-input" placeholder="Ask a question…" autocomplete="off" />
+    <button type="submit">Ask</button>
+  </form>
+
+  <footer class="site-footer">
+    <button class="btn-link open-methodology">About this prototype / methodology note</button>
+  </footer>
+</section>
+
+<!-- ===================== SCREEN 3 — Reflection ===================== -->
+<section id="screen-3" class="screen" tabindex="-1">
+  <div class="wrap">
+    <h2>Before you go</h2>
+    <p class="subtitle">Here's the public archive summary again, for comparison.</p>
+    <div class="archive-summary" id="reflect-archive-recap"></div>
+
+    <div class="reflection-block">
+      <label for="reflect-1">What did this interaction help you understand that the public archive summary did not?</label>
+      <textarea id="reflect-1"></textarea>
+    </div>
+    <div class="reflection-block">
+      <label for="reflect-2">What do you think was protected, and what may have been lost because of that protection?</label>
+      <textarea id="reflect-2"></textarea>
+    </div>
+    <div class="reflection-block">
+      <label for="reflect-3">When does AI help preserve testimony, and when might it distort it?</label>
+      <textarea id="reflect-3"></textarea>
+    </div>
+    <p class="subtitle">These reflections stay in your browser only — nothing here is saved or sent anywhere.</p>
+
+    <button class="btn-primary" id="finish-btn">Return to the archive summary</button>
+  </div>
+  <footer class="site-footer">
+    <button class="btn-link open-methodology">About this prototype / methodology note</button>
+  </footer>
+</section>
+
+<!-- ===================== Methodology modal ===================== -->
+<div id="methodology-modal" class="modal-overlay">
+  <div class="modal-box">
+    <h2>Methodology note</h2>
+    <p id="methodology-body"></p>
+    <button class="btn-primary" id="methodology-modal-close">Close</button>
+  </div>
+</div>
+
+<script src="matcher.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
