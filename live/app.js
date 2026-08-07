@@ -173,10 +173,56 @@ function addBotResponse(result) {
   log.scrollTop = log.scrollHeight;
 }
 
-function askQuestion(text) {
+function usePresetPath() {
+  return new URLSearchParams(window.location.search).has("preset");
+}
+
+function labelById(id) {
+  return Object.values(LABELS).find((l) => l.id === id) || LABELS.UNKNOWN;
+}
+
+// Adapts the preset proxy's flat {type, id, label, answer, rough} shape into
+// the {type, entry: {...}} shape addBotResponse() already expects from the
+// local matcher, so rendering code doesn't need to know which path answered.
+function adaptPresetResult(json) {
+  if (json.type === "match") {
+    return {
+      type: "match",
+      entry: {
+        id: json.id,
+        answer: json.answer,
+        label: labelById(json.label),
+        rough: json.rough || null,
+      },
+    };
+  }
+  if (json.type === "refusal") {
+    return { type: "refusal", answer: json.answer, rule: json.rule, id: json.id };
+  }
+  return { type: "unknown", label: LABELS.UNKNOWN, suggestions: json.suggestions || [] };
+}
+
+async function askQuestion(text) {
   addUserMessage(text);
-  const result = respondTo(text);
-  addBotResponse(result);
+
+  if (usePresetPath()) {
+    try {
+      const res = await fetch("/api/mediate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: text }),
+      });
+      if (!res.ok) throw new Error(`proxy responded ${res.status}`);
+      const json = await res.json();
+      addBotResponse(adaptPresetResult(json));
+    } catch (e) {
+      console.error("preset path failed, falling back to local matcher:", e);
+      addBotResponse(respondTo(text));
+    }
+  } else {
+    addBotResponse(respondTo(text));
+  }
+
   maybeShowReflectPrompt();
 }
 
