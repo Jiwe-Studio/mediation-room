@@ -9,6 +9,21 @@ const ARCHIVE_SUMMARY_TEXT =
 
 const METHODOLOGY_TEXT = `This prototype was built by Jiwe Games for Thought with Donkosira, SOAS (Marie Rodet), and Code for Africa's AI Sandbox fellowship. Every piece of testimony in this demo is synthetic — written to test the interaction model, not drawn from a real witness. It is not a simulation of a real survivor, not a replacement for testimony or human facilitation, and not an oracle of historical truth. It exists to make visible how testimony changes as it moves through memory, research mediation, and AI mediation, and to test refusal rules and mediation labels before any real testimony is ever involved.`;
 
+// "Lived experience" and "Memory & narration" have no screen behind them —
+// on purpose. Clicking them opens an explanation instead of navigating,
+// which is itself part of the point: some layers can't be retrieved or
+// clicked into.
+const LAYER_INFO = {
+  lived: {
+    title: "Lived experience",
+    body: "This is the original moment itself — before memory, before language, before anyone else touches it. This prototype can't take you here directly, and that's deliberate: some things can't be retrieved, clicked into, or reproduced. Everything you can reach in this room is already at least one step removed from this.",
+  },
+  memory: {
+    title: "Memory & narration",
+    body: "This is a person's own memory and telling of what happened — already shaped by time, by what they choose to share, and by who's listening. This prototype doesn't have direct access to this layer either. It only has what has already passed through research mediation and, on top of that, AI mediation.",
+  },
+};
+
 let reflectShown = false;
 
 function $(sel, root = document) {
@@ -33,6 +48,36 @@ function setLayer(active) {
 
 function toggleMethodologyModal() {
   $("#methodology-modal").classList.toggle("open");
+}
+
+function showLayerInfo(key) {
+  const info = LAYER_INFO[key];
+  if (!info) return;
+  $("#layer-info-title").textContent = info.title;
+  $("#layer-info-body").textContent = info.body;
+  $("#layer-info-modal").classList.add("open");
+}
+
+function closeLayerInfo() {
+  $("#layer-info-modal").classList.remove("open");
+}
+
+function goToChatRoom() {
+  showScreen(2);
+  if (!$("#chat-log").dataset.introShown) {
+    addBotVoiceIntro();
+    $("#chat-log").dataset.introShown = "1";
+  }
+}
+
+function handleLayerClick(key) {
+  if (key === "research") {
+    showScreen(1);
+  } else if (key === "ai") {
+    goToChatRoom();
+  } else {
+    showLayerInfo(key);
+  }
 }
 
 function toggleInlineMethodologyNote() {
@@ -258,13 +303,15 @@ function wireUp() {
   $("#methodology-modal-close").addEventListener("click", toggleMethodologyModal);
   $("#methodology-body").textContent = METHODOLOGY_TEXT;
 
-  $("#enter-room-btn").addEventListener("click", () => {
-    showScreen(2);
-    if (!$("#chat-log").dataset.introShown) {
-      addBotVoiceIntro();
-      $("#chat-log").dataset.introShown = "1";
-    }
+  $("#enter-room-btn").addEventListener("click", goToChatRoom);
+
+  $all(".back-btn").forEach((b) => {
+    b.addEventListener("click", () => showScreen(Number(b.dataset.back)));
   });
+  $all(".layer-indicator .layer").forEach((b) => {
+    b.addEventListener("click", () => handleLayerClick(b.dataset.layer));
+  });
+  $("#layer-info-close").addEventListener("click", closeLayerInfo);
 
   renderStarterQuestions();
 

@@ -123,28 +123,59 @@ button {
   margin-top: 1rem;
 }
 
-/* --- Layer indicator --- */
+/* --- Layer bar (back button + clickable layer breadcrumb) --- */
+.layer-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.6rem 1.5rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--paper-dark);
+  flex-wrap: wrap;
+}
+
+.back-btn {
+  background: none;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  border-radius: 4px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.8rem;
+  font-family: inherit;
+  flex-shrink: 0;
+}
+.back-btn:hover { background: var(--chip-bg); }
+
 .layer-indicator {
   display: flex;
   align-items: center;
   gap: 0.4rem;
   font-size: 0.78rem;
   color: var(--ink-soft);
-  padding: 0.6rem 1.5rem;
-  border-bottom: 1px solid var(--line);
-  background: var(--paper-dark);
   flex-wrap: wrap;
 }
 .layer-indicator .layer {
   padding: 0.15rem 0.5rem;
   border-radius: 10px;
   border: 1px solid var(--line);
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.78rem;
+}
+.layer-indicator .layer:hover {
+  background: var(--chip-bg);
+  border-color: var(--accent-soft);
 }
 .layer-indicator .layer.current {
   background: var(--accent);
   color: var(--paper);
   border-color: var(--accent);
   font-weight: 600;
+}
+.layer-indicator .layer[data-layer="lived"],
+.layer-indicator .layer[data-layer="memory"] {
+  border-style: dashed;
 }
 .layer-indicator .arrow { opacity: 0.5; }
 

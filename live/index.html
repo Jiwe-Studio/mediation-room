@@ -29,14 +29,17 @@
 
 <!-- ===================== SCREEN 1 — Public Archive Summary ===================== -->
 <section id="screen-1" class="screen" tabindex="-1">
-  <div class="layer-indicator" aria-label="Layers of mediation between you and the original lived experience">
-    <span class="layer" data-layer="lived">Lived experience</span>
-    <span class="arrow">→</span>
-    <span class="layer" data-layer="memory">Memory &amp; narration</span>
-    <span class="arrow">→</span>
-    <span class="layer" data-layer="research">Research mediation</span>
-    <span class="arrow">→</span>
-    <span class="layer" data-layer="ai">AI mediation</span>
+  <div class="layer-bar">
+    <button type="button" class="back-btn" data-back="0">← Back</button>
+    <div class="layer-indicator" aria-label="Layers of mediation between you and the original lived experience — click any layer">
+      <button type="button" class="layer" data-layer="lived" title="This layer can't be shown directly — click to learn why">Lived experience</button>
+      <span class="arrow">→</span>
+      <button type="button" class="layer" data-layer="memory" title="This layer can't be shown directly — click to learn why">Memory &amp; narration</button>
+      <span class="arrow">→</span>
+      <button type="button" class="layer" data-layer="research" title="Go to the public archive summary">Research mediation</button>
+      <span class="arrow">→</span>
+      <button type="button" class="layer" data-layer="ai" title="Go to the Mediation Room chat">AI mediation</button>
+    </div>
   </div>
   <div class="wrap">
     <h2>Public Archive Summary</h2>
@@ -53,14 +56,17 @@
 
 <!-- ===================== SCREEN 2 — The Mediation Room (chat) ===================== -->
 <section id="screen-2" class="screen" tabindex="-1" style="min-height:100vh;">
-  <div class="layer-indicator" aria-label="Layers of mediation between you and the original lived experience">
-    <span class="layer" data-layer="lived">Lived experience</span>
-    <span class="arrow">→</span>
-    <span class="layer" data-layer="memory">Memory &amp; narration</span>
-    <span class="arrow">→</span>
-    <span class="layer" data-layer="research">Research mediation</span>
-    <span class="arrow">→</span>
-    <span class="layer" data-layer="ai">AI mediation</span>
+  <div class="layer-bar">
+    <button type="button" class="back-btn" data-back="1">← Back</button>
+    <div class="layer-indicator" aria-label="Layers of mediation between you and the original lived experience — click any layer">
+      <button type="button" class="layer" data-layer="lived" title="This layer can't be shown directly — click to learn why">Lived experience</button>
+      <span class="arrow">→</span>
+      <button type="button" class="layer" data-layer="memory" title="This layer can't be shown directly — click to learn why">Memory &amp; narration</button>
+      <span class="arrow">→</span>
+      <button type="button" class="layer" data-layer="research" title="Go to the public archive summary">Research mediation</button>
+      <span class="arrow">→</span>
+      <button type="button" class="layer" data-layer="ai" title="Go to the Mediation Room chat">AI mediation</button>
+    </div>
   </div>
 
   <div class="chat-header">
@@ -92,6 +98,18 @@
 
 <!-- ===================== SCREEN 3 — Reflection ===================== -->
 <section id="screen-3" class="screen" tabindex="-1">
+  <div class="layer-bar">
+    <button type="button" class="back-btn" data-back="2">← Back</button>
+    <div class="layer-indicator" aria-label="Layers of mediation between you and the original lived experience — click any layer">
+      <button type="button" class="layer" data-layer="lived" title="This layer can't be shown directly — click to learn why">Lived experience</button>
+      <span class="arrow">→</span>
+      <button type="button" class="layer" data-layer="memory" title="This layer can't be shown directly — click to learn why">Memory &amp; narration</button>
+      <span class="arrow">→</span>
+      <button type="button" class="layer" data-layer="research" title="Go to the public archive summary">Research mediation</button>
+      <span class="arrow">→</span>
+      <button type="button" class="layer" data-layer="ai" title="Go to the Mediation Room chat">AI mediation</button>
+    </div>
+  </div>
   <div class="wrap">
     <h2>Before you go</h2>
     <p class="subtitle">Here's the public archive summary again, for comparison.</p>
@@ -124,6 +142,15 @@
     <h2>Methodology note</h2>
     <p id="methodology-body"></p>
     <button class="btn-primary" id="methodology-modal-close">Close</button>
+  </div>
+</div>
+
+<!-- ===================== Layer info modal (for non-navigable layers) ===================== -->
+<div id="layer-info-modal" class="modal-overlay">
+  <div class="modal-box">
+    <h2 id="layer-info-title"></h2>
+    <p id="layer-info-body"></p>
+    <button class="btn-primary" id="layer-info-close">Close</button>
   </div>
 </div>
 
