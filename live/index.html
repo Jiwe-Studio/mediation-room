@@ -8,6 +8,12 @@
 </head>
 <body>
 
+<noscript>
+  <div style="max-width:640px;margin:3rem auto;padding:1.4rem;border:1px solid #cfc4ac;border-radius:6px;font-family:sans-serif;">
+    <strong>This prototype needs JavaScript.</strong> The chat, starter questions, refusal rules, and reflection flow all depend on it — with JavaScript disabled, this page can't run. Please enable JavaScript and reload.
+  </div>
+</noscript>
+
 <!-- ===================== SCREEN 0 — Disclaimer / Entry ===================== -->
 <section id="screen-0" class="screen active" tabindex="-1">
   <div class="wrap">
@@ -17,10 +23,12 @@
     <div class="disclaimer-box">
       <p><strong>This is a prototype.</strong> All testimony you'll read here is synthetic — written for this demo, not a real person's words. It exists to help you understand how testimony changes as it becomes public, not to let you "talk to a survivor."</p>
       <p>You are not here to talk to a victim. You are here to understand what can be preserved, what must be protected, and what may be lost when testimony becomes public.</p>
+      <p>Who you're actually querying: a <strong>synthetic AI persona</strong> — a constructed, disclosed voice for holding and presenting protected fragments of testimony. It is not a chatbot playing a survivor, not a witness, and not a historical record. Everything it says is drawn from a small, fixed set of pre-written, reviewed answers.</p>
       <button class="btn-link" id="methodology-toggle-0" aria-expanded="false">Read the full methodology note ▾</button>
       <div class="methodology-note-inline" id="methodology-note-0">
         This prototype uses synthetic testimony created for demonstration purposes only. It is not a simulation of a real survivor, a replacement for testimony or human facilitation, or an oracle of historical truth. Its purpose is to test the interaction model, ethical boundaries, refusal rules, and mediation labels before any real testimony is ever involved. Built by Jiwe Games for Thought with Donkosira, SOAS (Marie Rodet), and Code for Africa's AI Sandbox fellowship.
       </div>
+      <button class="btn-link open-rules" type="button">View the rules this AI follows ▾</button>
     </div>
 
     <button class="btn-primary" id="enter-btn">Enter</button>
@@ -44,9 +52,9 @@
   <div class="wrap">
     <h2>Public Archive Summary</h2>
     <div class="archive-summary" id="archive-summary-text">
-      In some communities, inherited social status has shaped people's access to land, work, marriage, social participation, and public recognition. These histories are often difficult to document because many people avoid speaking openly about them. Silence may protect individuals from stigma, but it can also make the harm harder to understand, remember, or challenge.
+      This history involves descent-based discrimination: people treated as lower-status — denied land, marriage, work, or a public voice — because of who their ancestors were, not anything they did themselves. These histories are often difficult to document because speaking openly can reopen the very stigma it describes. Silence may protect individuals, but it also makes the harm harder to understand, remember, or challenge.
     </div>
-    <p class="prompt-line">This summary is accurate but incomplete.<br />What is missing when lived experience is reduced to a public record?</p>
+    <p class="prompt-line">This summary is accurate to the testimony behind it, but incomplete — for the purposes of this exercise, treat it as if it represents a real life.<br />What is missing when lived experience is reduced to a public record?</p>
     <button class="btn-primary" id="enter-room-btn">Enter the Mediation Room</button>
   </div>
   <footer class="site-footer">
@@ -71,12 +79,13 @@
 
   <div class="chat-header">
     <h2 style="margin-bottom:0.2rem;">The Mediation Room</h2>
-    <p class="subtitle" style="margin-top:0;">Ask a question, or choose one below. Some questions will be refused on purpose — that's part of the point.</p>
+    <p class="subtitle" style="margin-top:0;">You're speaking with a synthetic AI persona, not a survivor. Ask a question, or choose one below. Some questions will be refused on purpose — refusals here protect real people's privacy, resist turning testimony into spectacle, and refuse to assign blame or impersonate a survivor.</p>
+    <button class="btn-link open-rules" type="button">View the rules this AI follows ▾</button>
   </div>
 
   <div class="starter-questions">
     <div class="label">Starter questions</div>
-    <div class="chip-row" id="starter-chip-row"></div>
+    <div class="chip-row" id="starter-chip-row">Loading starter questions…</div>
   </div>
 
   <div class="chat-log" id="chat-log" aria-live="polite"></div>
@@ -113,19 +122,21 @@
   <div class="wrap">
     <h2>Before you go</h2>
     <p class="subtitle">Here's the public archive summary again, for comparison.</p>
-    <div class="archive-summary" id="reflect-archive-recap"></div>
+    <div class="archive-summary" id="reflect-archive-recap">
+      This history involves descent-based discrimination: people treated as lower-status — denied land, marriage, work, or a public voice — because of who their ancestors were, not anything they did themselves. These histories are often difficult to document because speaking openly can reopen the very stigma it describes. Silence may protect individuals, but it also makes the harm harder to understand, remember, or challenge.
+    </div>
 
     <div class="reflection-block">
-      <label for="reflect-1">What did this interaction help you understand that the public archive summary did not?</label>
-      <textarea id="reflect-1"></textarea>
+      <label for="reflect-1">Did this conversation flatten the emotional weight of the history, or did the mediation labels help you notice what had been simplified?</label>
+      <textarea id="reflect-1" placeholder="Type your thoughts here…"></textarea>
     </div>
     <div class="reflection-block">
-      <label for="reflect-2">What do you think was protected, and what may have been lost because of that protection?</label>
-      <textarea id="reflect-2"></textarea>
+      <label for="reflect-2">What did the AI refuse to share that a public archive summary would normally leave out too — and did noticing that refusal change how you read the summary on the previous screen?</label>
+      <textarea id="reflect-2" placeholder="Type your thoughts here…"></textarea>
     </div>
     <div class="reflection-block">
-      <label for="reflect-3">When does AI help preserve testimony, and when might it distort it?</label>
-      <textarea id="reflect-3"></textarea>
+      <label for="reflect-3">What did this interaction let you understand that the two-paragraph public summary couldn't — and what still stayed out of reach even here?</label>
+      <textarea id="reflect-3" placeholder="Type your thoughts here…"></textarea>
     </div>
     <p class="subtitle">These reflections stay in your browser only — nothing here is saved or sent anywhere.</p>
 
@@ -140,8 +151,21 @@
 <div id="methodology-modal" class="modal-overlay">
   <div class="modal-box">
     <h2>Methodology note</h2>
-    <p id="methodology-body"></p>
+    <!-- Pre-filled directly (kept in sync with app.js's METHODOLOGY_TEXT by hand)
+         so this never reads blank if JS is slow to attach — app.js overwrites it
+         with the same text on load, which is a harmless no-op when they match. -->
+    <p id="methodology-body">This prototype was built by Jiwe Games for Thought with Donkosira, SOAS (Marie Rodet), and Code for Africa's AI Sandbox fellowship. Every piece of testimony in this demo is synthetic — written to test the interaction model, not drawn from a real witness. It is not a simulation of a real survivor, not a replacement for testimony or human facilitation, and not an oracle of historical truth. It exists to make visible how testimony changes as it moves through memory, research mediation, and AI mediation, and to test refusal rules and mediation labels before any real testimony is ever involved.</p>
     <button class="btn-primary" id="methodology-modal-close">Close</button>
+  </div>
+</div>
+
+<!-- ===================== Rules modal — same list injected into the AI's own system prompt (matcher.js HARD_RULES) ===================== -->
+<div id="rules-modal" class="modal-overlay">
+  <div class="modal-box">
+    <h2>The rules this AI follows</h2>
+    <p class="subtitle" style="margin-top:0;">This isn't a summary written after the fact — it's the same rule list given directly to the AI. Nothing here is enforced on it that isn't also disclosed to you.</p>
+    <ul id="rules-list" class="rules-list"></ul>
+    <button class="btn-primary" id="rules-modal-close">Close</button>
   </div>
 </div>
 

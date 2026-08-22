@@ -4,23 +4,31 @@
  * PROCESS_BANK, REFUSAL_BANK, respondTo are all globals in the browser).
  */
 
+// Kept in sync by hand with index.html's static #archive-summary-text and
+// #reflect-archive-recap fallback content — see the blank-state note near
+// those elements in index.html for why they're duplicated.
 const ARCHIVE_SUMMARY_TEXT =
-  "In some communities, inherited social status has shaped people's access to land, work, marriage, social participation, and public recognition. These histories are often difficult to document because many people avoid speaking openly about them. Silence may protect individuals from stigma, but it can also make the harm harder to understand, remember, or challenge.";
+  "This history involves descent-based discrimination: people treated as lower-status — denied land, marriage, work, or a public voice — because of who their ancestors were, not anything they did themselves. These histories are often difficult to document because speaking openly can reopen the very stigma it describes. Silence may protect individuals, but it also makes the harm harder to understand, remember, or challenge.";
 
 const METHODOLOGY_TEXT = `This prototype was built by Jiwe Games for Thought with Donkosira, SOAS (Marie Rodet), and Code for Africa's AI Sandbox fellowship. Every piece of testimony in this demo is synthetic — written to test the interaction model, not drawn from a real witness. It is not a simulation of a real survivor, not a replacement for testimony or human facilitation, and not an oracle of historical truth. It exists to make visible how testimony changes as it moves through memory, research mediation, and AI mediation, and to test refusal rules and mediation labels before any real testimony is ever involved.`;
 
 // "Lived experience" and "Memory & narration" have no screen behind them —
 // on purpose. Clicking them opens an explanation instead of navigating,
 // which is itself part of the point: some layers can't be retrieved or
-// clicked into.
+// clicked into. Each body also names the fact that THIS demo specifically
+// never populated these two layers at all (no interview, no memory, real
+// or synthetic, was ever collected for them) — distinct from the general
+// claim that no archive can ever hand you lived experience or raw memory
+// directly. Both things are true; conflating them would overclaim what
+// this particular prototype is sitting on.
 const LAYER_INFO = {
   lived: {
     title: "Lived experience",
-    body: "This is the original moment itself — before memory, before language, before anyone else touches it. This prototype can't take you here directly, and that's deliberate: some things can't be retrieved, clicked into, or reproduced. Everything you can reach in this room is already at least one step removed from this.",
+    body: "This is the original moment itself — before memory, before language, before anyone else touches it. This prototype can't take you here directly, and that's deliberate: some things can't be retrieved, clicked into, or reproduced. Everything you can reach in this room is already at least one step removed from this. In this synthetic demo specifically, there is no real lived experience behind this layer either — it's shown so the full real-world pipeline stays honest about what any testimony work is built on top of, not because real content sits just out of reach here.",
   },
   memory: {
     title: "Memory & narration",
-    body: "This is a person's own memory and telling of what happened — already shaped by time, by what they choose to share, and by who's listening. This prototype doesn't have direct access to this layer either. It only has what has already passed through research mediation and, on top of that, AI mediation.",
+    body: "This is a person's own memory and telling of what happened — already shaped by time, by what they choose to share, and by who's listening. This prototype doesn't have direct access to this layer either. It only has what has already passed through research mediation and, on top of that, AI mediation. In this synthetic demo specifically, no interview or memory ever took place — this layer illustrates the real-world pipeline this design is meant for, not a real account being withheld from you.",
   },
 };
 
@@ -48,6 +56,37 @@ function setLayer(active) {
 
 function toggleMethodologyModal() {
   $("#methodology-modal").classList.toggle("open");
+}
+
+// Renders the exact same HARD_RULES list (matcher.js) that's injected
+// verbatim into the AI's own system prompt — see generate-system-prompt.js
+// and generate-system-prompt-v2.js. One source of truth: what's shown here
+// can never quietly drift from what's actually enforced. If this app is
+// ever switched to Version B (composed answers), append
+// HARD_RULES_VERSION_B_ADDITIONS here too.
+function renderRulesList() {
+  const list = $("#rules-list");
+  if (!list || list.childElementCount > 0) return; // render once
+  const rules = typeof HARD_RULES !== "undefined" ? HARD_RULES : [];
+  rules.forEach((r) => {
+    const li = document.createElement("li");
+    const strong = document.createElement("strong");
+    strong.textContent = r.title;
+    li.appendChild(strong);
+    li.appendChild(document.createTextNode(" — " + r.detail));
+    if (r.rationale) {
+      const why = document.createElement("div");
+      why.className = "rule-rationale";
+      why.textContent = "Why: " + r.rationale;
+      li.appendChild(why);
+    }
+    list.appendChild(li);
+  });
+}
+
+function toggleRulesModal() {
+  renderRulesList();
+  $("#rules-modal").classList.toggle("open");
 }
 
 function showLayerInfo(key) {
@@ -195,6 +234,17 @@ function addBotResponse(result) {
   if (label) labelChip(label, bubble);
   if (rough) addMediationToggle(bubble, answerText, rough);
 
+  // Refusals aren't arbitrary — say briefly why this one exists, using the
+  // same rationale text that's also shown in the "View the rules" panel
+  // and given to the AI itself, so it's never a different explanation in
+  // three different places.
+  if (result.type === "refusal" && result.rationale) {
+    const why = document.createElement("div");
+    why.className = "refusal-rationale";
+    why.textContent = "Why refused: " + result.rationale;
+    bubble.appendChild(why);
+  }
+
   if (result.type === "unknown" && result.suggestions && result.suggestions.length) {
     const sugWrap = document.createElement("div");
     sugWrap.className = "suggestions";
@@ -226,9 +276,10 @@ function labelById(id) {
   return Object.values(LABELS).find((l) => l.id === id) || LABELS.UNKNOWN;
 }
 
-// Adapts the preset proxy's flat {type, id, label, answer, rough} shape into
-// the {type, entry: {...}} shape addBotResponse() already expects from the
-// local matcher, so rendering code doesn't need to know which path answered.
+// Adapts the preset proxy's flat {type, id, label, answer, rough, rationale}
+// shape into the {type, entry: {...}} shape addBotResponse() already expects
+// from the local matcher, so rendering code doesn't need to know which path
+// answered.
 function adaptPresetResult(json) {
   if (json.type === "match") {
     return {
@@ -242,7 +293,13 @@ function adaptPresetResult(json) {
     };
   }
   if (json.type === "refusal") {
-    return { type: "refusal", answer: json.answer, rule: json.rule, id: json.id };
+    return {
+      type: "refusal",
+      answer: json.answer,
+      rule: json.rule,
+      id: json.id,
+      rationale: json.rationale,
+    };
   }
   return { type: "unknown", label: LABELS.UNKNOWN, suggestions: json.suggestions || [] };
 }
@@ -302,6 +359,9 @@ function wireUp() {
   $all(".open-methodology").forEach((b) => b.addEventListener("click", toggleMethodologyModal));
   $("#methodology-modal-close").addEventListener("click", toggleMethodologyModal);
   $("#methodology-body").textContent = METHODOLOGY_TEXT;
+
+  $all(".open-rules").forEach((b) => b.addEventListener("click", toggleRulesModal));
+  $("#rules-modal-close").addEventListener("click", toggleRulesModal);
 
   $("#enter-room-btn").addEventListener("click", goToChatRoom);
 

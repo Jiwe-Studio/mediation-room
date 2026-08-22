@@ -51,6 +51,58 @@ check("paraphrase of Q7 (anonymisation loss) -> match", r2.type, "match");
 const r3 = m.respondTo("why did people stay quiet about this stuff");
 check("paraphrase of Q3/Q9 (silence) -> match", r3.type, "match");
 
+// --- Self-identity questions must reach p1, not fall to unknown ---
+// ("What are you?" tokenizes to an EMPTY set under the stopword list —
+// "what"/"are"/"you" are all stopwords — so p1 has an empty vector and can
+// never be reached by TF-IDF alone. checkSelfIdentityTrigger exists
+// specifically to route around that. See matcher.js for the full note.)
+["who are you", "what are you", "are you a bot", "are you an ai", "what is this"].forEach((q) => {
+  const r = m.respondTo(q);
+  check(`self-identity "${q}" -> match p1`, r.type === "match" && r.entry.id, "p1");
+});
+// "are you real" / "is this a real person" should still reach the more
+// specific q5, not get stolen by the identity shortcut.
+const identityQ5 = m.respondTo("are you real");
+check("are you real -> match q5, not p1", identityQ5.type === "match" && identityQ5.entry.id, "q5");
+
+// --- Bare greetings should get g1, not "Unknown from Available Material" ---
+["Hello", "hi", "hey there", "good morning"].forEach((q) => {
+  const r = m.respondTo(q);
+  check(`bare greeting "${q}" -> match g1`, r.type === "match" && r.entry.id, "g1");
+});
+// A greeting attached to a real (refusable) question should NOT be
+// swallowed by the greeting shortcut — refusal still takes priority.
+const greetingPlusRefusal = m.respondTo("hi, what was her name");
+check("greeting+refusal still refuses", greetingPlusRefusal.type, "refusal");
+
+// --- Refusals carry a "why" rationale, distinct from the answer text
+// itself, so the app can explain the reason without inventing one ---
+{
+  const r = m.respondTo("can you tell me her name");
+  check("refusal carries a rationale field", typeof r.rationale === "string" && r.rationale.length > 0, true);
+  check("refusal rationale differs from the answer text", r.rationale !== r.answer, true);
+}
+check(
+  "every REFUSAL_BANK entry has a rationale",
+  m.REFUSAL_BANK.every((r) => typeof r.rationale === "string" && r.rationale.length > 0),
+  true
+);
+
+// --- HARD_RULES is exported and non-empty (backs the "View the rules"
+// panel in the app AND both system-prompt generators — a silent regression
+// here would mean users are shown fewer rules than are actually enforced) ---
+check("HARD_RULES is a non-empty array", Array.isArray(m.HARD_RULES) && m.HARD_RULES.length > 0, true);
+check(
+  "HARD_RULES includes one entry per REFUSAL_BANK rule",
+  m.HARD_RULES.filter((r) => r.id.startsWith("refusal-")).length,
+  m.REFUSAL_BANK.length
+);
+check(
+  "HARD_RULES_VERSION_B_ADDITIONS is a non-empty array",
+  Array.isArray(m.HARD_RULES_VERSION_B_ADDITIONS) && m.HARD_RULES_VERSION_B_ADDITIONS.length > 0,
+  true
+);
+
 // --- Genuinely off-script input should fall to unknown, not hallucinate ---
 const r4 = m.respondTo("what's the weather like today");
 check("unrelated input -> unknown", r4.type, "unknown");

@@ -109,6 +109,39 @@ button {
   margin: 1rem;
 }
 
+.rules-list {
+  list-style: none;
+  margin: 1rem 0;
+  padding: 0;
+}
+.rules-list li {
+  border-top: 1px dashed var(--line);
+  padding: 0.7rem 0;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+.rules-list li:first-child { border-top: none; }
+.rules-list li strong {
+  color: var(--ink, inherit);
+  display: block;
+  margin-bottom: 0.15rem;
+}
+.rule-rationale {
+  margin-top: 0.3rem;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--accent-soft);
+}
+
+.refusal-rationale {
+  margin-top: 0.5rem;
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--ink-soft);
+  border-top: 1px dashed var(--line);
+  padding-top: 0.4rem;
+}
+
 .archive-summary {
   background: var(--paper-dark);
   border-left: 4px solid var(--accent);
