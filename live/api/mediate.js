@@ -4,6 +4,25 @@
  * HANDOFF-preset-wiring.md's call format. Never expose this key to the
  * browser directly (app.js only ever talks to this endpoint).
  */
+
+// Some models (e.g. gpt-oss-120b, this preset's primary) can leak raw chat-
+// template tokens ahead of the JSON body — e.g.
+// "<|start|>assistant<|channel|>final{...}" — that markdown-fence stripping
+// alone doesn't catch. The output contract guarantees a single JSON object,
+// so extracting the outermost {...} span is more robust than trying to
+// enumerate every possible prefix format.
+function extractJsonObject(raw) {
+  const trimmed = (raw || "").trim();
+  const first = trimmed.indexOf("{");
+  const last = trimmed.lastIndexOf("}");
+  if (first === -1 || last === -1 || last < first) return null;
+  try {
+    return JSON.parse(trimmed.slice(first, last + 1));
+  } catch (e) {
+    return null;
+  }
+}
+
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
     res.status(405).json({ error: "method not allowed" });
@@ -43,14 +62,7 @@ module.exports = async (req, res) => {
 
     const data = await upstream.json();
     const raw = data.choices?.[0]?.message?.content ?? "";
-    const cleaned = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "");
-
-    let parsed;
-    try {
-      parsed = JSON.parse(cleaned);
-    } catch (e) {
-      parsed = null;
-    }
+    const parsed = extractJsonObject(raw);
 
     if (!parsed || typeof parsed.type !== "string") {
       res.status(502).json({ error: "unparseable model output", raw: raw.slice(0, 300) });

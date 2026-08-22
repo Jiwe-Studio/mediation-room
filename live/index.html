@@ -81,6 +81,12 @@
     <h2 style="margin-bottom:0.2rem;">The Mediation Room</h2>
     <p class="subtitle" style="margin-top:0;">You're speaking with a synthetic AI persona, not a survivor. Ask a question, or choose one below. Some questions will be refused on purpose — refusals here protect real people's privacy, resist turning testimony into spectacle, and refuse to assign blame or impersonate a survivor.</p>
     <button class="btn-link open-rules" type="button">View the rules this AI follows ▾</button>
+    <div class="version-toggle" id="version-toggle" style="display:none;">
+      <span class="version-toggle-label">Testing mode — answer source:</span>
+      <button type="button" class="version-btn" data-version="local">Local matcher</button>
+      <button type="button" class="version-btn" data-version="a">Version A (retrieval)</button>
+      <button type="button" class="version-btn" data-version="b">Version B (composed)</button>
+    </div>
   </div>
 
   <div class="starter-questions">

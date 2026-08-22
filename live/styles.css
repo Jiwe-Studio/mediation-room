@@ -142,6 +142,62 @@ button {
   padding-top: 0.4rem;
 }
 
+/* --- Version toggle (testing mode only, hidden for real visitors) --- */
+.version-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px dashed var(--line);
+}
+.version-toggle-label {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+.version-btn {
+  background: none;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  border-radius: 14px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.78rem;
+}
+.version-btn:hover { background: var(--chip-bg); }
+.version-btn.active {
+  background: var(--accent);
+  color: var(--paper);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+/* --- Composed answers (Version B) --- */
+.segment-archive {
+  background: var(--paper-dark);
+  border-left: 3px solid var(--accent);
+  padding: 0.15rem 0.5rem;
+}
+.segment-ai {
+  color: var(--ink);
+}
+.segment-source {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--ink-soft);
+  margin-top: 0.15rem;
+}
+.provenance-badge {
+  display: inline-block;
+  margin-top: 0.6rem;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  background: var(--paper-dark);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.15rem 0.6rem;
+}
+
 .archive-summary {
   background: var(--paper-dark);
   border-left: 4px solid var(--accent);

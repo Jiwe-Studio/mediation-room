@@ -222,14 +222,33 @@ function addBotResponse(result) {
     answerText = result.entry.answer;
     label = result.entry.label;
     rough = result.entry.rough || null;
+  } else if (result.type === "composed") {
+    cls = "bot composed";
+    label = result.label;
   }
 
   div.className = `msg ${cls}`;
   div.innerHTML = `<div class="role">${roleLabel}</div><div class="bubble"></div>`;
   const bubble = $(".bubble", div);
-  const p = document.createElement("div");
-  p.textContent = answerText;
-  bubble.appendChild(p);
+
+  if (result.type === "composed" && Array.isArray(result.segments)) {
+    result.segments.forEach((seg) => {
+      const segEl = document.createElement("span");
+      segEl.className = seg.type === "archive" ? "segment-archive" : "segment-ai";
+      segEl.textContent = (seg.text || "") + " ";
+      bubble.appendChild(segEl);
+      if (seg.type === "archive" && seg.sourceId) {
+        const src = document.createElement("span");
+        src.className = "segment-source";
+        src.textContent = `— ${seg.sourceId}`;
+        bubble.appendChild(src);
+      }
+    });
+  } else {
+    const p = document.createElement("div");
+    p.textContent = answerText;
+    bubble.appendChild(p);
+  }
 
   if (label) labelChip(label, bubble);
   if (rough) addMediationToggle(bubble, answerText, rough);
@@ -243,6 +262,14 @@ function addBotResponse(result) {
     why.className = "refusal-rationale";
     why.textContent = "Why refused: " + result.rationale;
     bubble.appendChild(why);
+  }
+
+  if (result.type === "composed" && result.provenance) {
+    const badge = document.createElement("div");
+    badge.className = "provenance-badge";
+    badge.textContent =
+      `Archive ${result.provenance.archivePercent}% / AI ${result.provenance.aiPercent}% (code-verified)`;
+    bubble.appendChild(badge);
   }
 
   if (result.type === "unknown" && result.suggestions && result.suggestions.length) {
@@ -268,19 +295,66 @@ function addBotResponse(result) {
   log.scrollTop = log.scrollHeight;
 }
 
-function usePresetPath() {
+// "?preset" in the URL puts the room into testing mode: the version
+// toggle becomes visible and answers can come from either OpenRouter
+// preset instead of the local matcher. Real visitors (no query param) never
+// see the toggle and always get the local matcher — per the README's
+// private-test-first rollout plan, neither preset is a default yet.
+function usePresetTestMode() {
   return new URLSearchParams(window.location.search).has("preset");
+}
+
+// The active version persists per-session (sessionStorage) so switching
+// screens or asking several questions doesn't reset the tester's choice.
+// A bare "?preset" (no value) defaults to "a" — this keeps existing
+// testing links/bookmarks from before the toggle existed working exactly
+// as they did.
+function getActiveVersion() {
+  const stored = sessionStorage.getItem("mediationRoomVersion");
+  if (stored === "local" || stored === "a" || stored === "b") return stored;
+  const urlValue = new URLSearchParams(window.location.search).get("preset");
+  if (urlValue === "b" || urlValue === "local") return urlValue;
+  return "a";
+}
+
+function setActiveVersion(v) {
+  sessionStorage.setItem("mediationRoomVersion", v);
+  renderVersionToggle();
+}
+
+function renderVersionToggle() {
+  const wrap = $("#version-toggle");
+  if (!wrap) return;
+  if (!usePresetTestMode()) {
+    wrap.style.display = "none";
+    return;
+  }
+  wrap.style.display = "flex";
+  const active = getActiveVersion();
+  $all(".version-btn", wrap).forEach((b) => {
+    b.classList.toggle("active", b.dataset.version === active);
+  });
 }
 
 function labelById(id) {
   return Object.values(LABELS).find((l) => l.id === id) || LABELS.UNKNOWN;
 }
 
-// Adapts the preset proxy's flat {type, id, label, answer, rough, rationale}
-// shape into the {type, entry: {...}} shape addBotResponse() already expects
-// from the local matcher, so rendering code doesn't need to know which path
-// answered.
+// Adapts a preset proxy's response into the shape addBotResponse() already
+// expects from the local matcher, so rendering code doesn't need to know
+// which path (local / Version A / Version B) answered:
+//   - simple match  -> { type: "match", entry: {...} }
+//   - composed match (Version B only) -> { type: "composed", segments, label, provenance }
+//   - refusal / unknown -> passed through with the same shape either way
 function adaptPresetResult(json) {
+  if (json.type === "match" && json.mode === "composed") {
+    return {
+      type: "composed",
+      segments: json.segments,
+      label: labelById(json.label),
+      provenance: json.provenance || null,
+    };
+  }
   if (json.type === "match") {
     return {
       type: "match",
@@ -307,18 +381,24 @@ function adaptPresetResult(json) {
 async function askQuestion(text) {
   addUserMessage(text);
 
-  if (usePresetPath()) {
+  const version = usePresetTestMode() ? getActiveVersion() : "local";
+
+  if (version === "a" || version === "b") {
+    const endpoint = version === "b" ? "/api/mediate-v2" : "/api/mediate";
     try {
-      const res = await fetch("/api/mediate", {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: text }),
       });
-      if (!res.ok) throw new Error(`proxy responded ${res.status}`);
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `proxy responded ${res.status}`);
+      }
       const json = await res.json();
       addBotResponse(adaptPresetResult(json));
     } catch (e) {
-      console.error("preset path failed, falling back to local matcher:", e);
+      console.error(`preset path (version ${version}) failed, falling back to local matcher:`, e);
       addBotResponse(respondTo(text));
     }
   } else {
@@ -372,6 +452,11 @@ function wireUp() {
     b.addEventListener("click", () => handleLayerClick(b.dataset.layer));
   });
   $("#layer-info-close").addEventListener("click", closeLayerInfo);
+
+  $all(".version-btn").forEach((b) => {
+    b.addEventListener("click", () => setActiveVersion(b.dataset.version));
+  });
+  renderVersionToggle();
 
   renderStarterQuestions();
 
