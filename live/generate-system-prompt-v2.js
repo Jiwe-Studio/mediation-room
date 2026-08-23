@@ -227,7 +227,7 @@ silent). A composed response might look like:
     { "type": "ai", "text": "This touches two connected questions in the material: why speaking out was hard, and what silence actually protected." },
     { "type": "archive", "text": "Speaking openly could expose a person, a family, or a community. It could reopen stigma or create new harm.", "sourceId": "q3", "source": "qa" },
     { "type": "ai", "text": "But that protection had a cost of its own." },
-    { "type": "archive", "text": "It made the experience harder to document, harder to challenge, and easier for others to deny.", "sourceId": "q9:s2", "source": "qa" }
+    { "type": "archive", "text": "It made the experience harder to document, harder to challenge, and easier for others to deny.", "sourceId": "q9:s3", "source": "qa" }
   ]
 }
 Notice: the "ai" segments only frame and connect — they add no new facts.
