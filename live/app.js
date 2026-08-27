@@ -12,23 +12,28 @@ const ARCHIVE_SUMMARY_TEXT =
 
 const METHODOLOGY_TEXT = `This prototype was built by Jiwe Games for Thought with Donkosira, SOAS (Marie Rodet), and Code for Africa's AI Sandbox fellowship. Every piece of testimony in this demo is synthetic — written to test the interaction model, not drawn from a real witness. It is not a simulation of a real survivor, not a replacement for testimony or human facilitation, and not an oracle of historical truth. It exists to make visible how testimony changes as it moves through memory, research mediation, and AI mediation, and to test refusal rules and mediation labels before any real testimony is ever involved.`;
 
-// "Lived experience" and "Memory & narration" have no screen behind them —
-// on purpose. Clicking them opens an explanation instead of navigating,
-// which is itself part of the point: some layers can't be retrieved or
-// clicked into. Each body also names the fact that THIS demo specifically
-// never populated these two layers at all (no interview, no memory, real
-// or synthetic, was ever collected for them) — distinct from the general
-// claim that no archive can ever hand you lived experience or raw memory
-// directly. Both things are true; conflating them would overclaim what
-// this particular prototype is sitting on.
+// "Lived Experience", "The Interview", and "The Translation" have no screen
+// behind them — on purpose. Clicking them opens an explanation instead of
+// navigating, which is itself part of the point: some layers can't be
+// retrieved or clicked into. Each body also names the fact that THIS demo
+// specifically never populated these three layers at all (no interview, no
+// translation/anonymisation pass, real or synthetic, was ever done) —
+// distinct from the general claim that no interface can ever hand you raw
+// lived experience, a private interview, or an unreviewed translation
+// directly. Both things are true; conflating them would overclaim what this
+// particular prototype is sitting on.
 const LAYER_INFO = {
   lived: {
     title: "Lived Experience",
     body: "This is the original moment itself — before memory, before language, before anyone else touches it. This prototype can't take you here directly, and that's deliberate: some things can't be retrieved, clicked into, or reproduced. Everything you can reach in this room is already at least one step removed from this. In this synthetic demo specifically, there is no real lived experience behind this layer either — it's shown so the full real-world pipeline stays honest about what any testimony work is built on top of, not because real content sits just out of reach here.",
   },
-  memory: {
-    title: "Personal Memory",
-    body: "This is a person's own memory and telling of what happened — already shaped by time, by what they choose to share, and by who's listening. This prototype doesn't have direct access to this layer either. It only has what has already passed through the public archive and, on top of that, AI mediation. In this synthetic demo specifically, no interview or memory ever took place — this layer illustrates the real-world pipeline this design is meant for, not a real account being withheld from you.",
+  interview: {
+    title: "The Interview",
+    body: "This is where someone tells their story out loud, in their own words, to another person — already shaped by memory, by what they choose to share, and by who's listening. This prototype can't take you here directly either: an interview is a private moment between two people, not something a public interface can hand you raw. In this synthetic demo specifically, no interview ever took place — this layer illustrates a real stage in the pipeline this design is meant for, not a real conversation being withheld from you.",
+  },
+  translation: {
+    title: "The Translation",
+    body: "This is where a raw interview becomes usable material: anonymised, translated, summarised, and reviewed by researchers before it can safely be shared. Names, places, and identifying detail get stripped out here — protecting the person, but also flattening some of what made their account theirs. This prototype doesn't show you this step directly either. In this synthetic demo specifically, no real interview ever existed to translate — this layer illustrates a real stage in the pipeline, not a real document being withheld from you.",
   },
 };
 

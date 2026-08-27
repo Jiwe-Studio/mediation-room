@@ -277,7 +277,8 @@ button {
   font-weight: 600;
 }
 .layer-indicator .layer[data-layer="lived"],
-.layer-indicator .layer[data-layer="memory"] {
+.layer-indicator .layer[data-layer="interview"],
+.layer-indicator .layer[data-layer="translation"] {
   border-style: dashed;
 }
 .layer-indicator .arrow { opacity: 0.5; }
