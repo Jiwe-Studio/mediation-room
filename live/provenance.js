@@ -16,14 +16,19 @@
  * move past — Version B's entire safety case rests on this check being
  * real, not on the model self-reporting honestly.
  */
-const { QA_BANK, PROCESS_BANK, REFUSAL_BANK, splitSentences } = require("./matcher.js");
+const { QA_BANK, PROCESS_BANK, splitSentences } = require("./matcher.js");
+
+// Only QA_BANK and PROCESS_BANK entries are legitimate citation targets.
+// REFUSAL_BANK is deliberately excluded: refusal responses are never
+// composed in the first place (see generate-system-prompt-v2.js's hard
+// rules), so a composed answer citing a refusal entry as if it were
+// approved archive material is itself a fabrication, not a valid quote —
+// this used to be reachable (findEntry searched REFUSAL_BANK too), which
+// would have let such a citation verify successfully. Fixed.
+const CITABLE_SOURCES = ["qa", "process"];
 
 function findEntry(entryId) {
-  return (
-    QA_BANK.find((e) => e.id === entryId) ||
-    PROCESS_BANK.find((e) => e.id === entryId) ||
-    REFUSAL_BANK.find((e) => e.id === entryId)
-  );
+  return QA_BANK.find((e) => e.id === entryId) || PROCESS_BANK.find((e) => e.id === entryId);
 }
 
 // sourceId is either a bare entry id ("q2") or an entry id plus a 1-based
@@ -97,6 +102,11 @@ function scoreProvenance(segments) {
     }
 
     if (seg.type === "archive") {
+      if (!CITABLE_SOURCES.includes(seg.source)) {
+        hallucinationRisk = true;
+        issues.push({ index: i, message: `source "${seg.source}" is not a citable archive source (only "qa"/"process" are)` });
+        return;
+      }
       const truth = resolveSourceText(seg.sourceId);
       if (truth === null) {
         hallucinationRisk = true;

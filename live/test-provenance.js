@@ -1,5 +1,5 @@
 const { scoreProvenance, resolveSourceText } = require("./provenance.js");
-const { QA_BANK, PROCESS_BANK, splitSentences } = require("./matcher.js");
+const { QA_BANK, PROCESS_BANK, REFUSAL_BANK, splitSentences } = require("./matcher.js");
 
 let pass = 0;
 let fail = 0;
@@ -104,6 +104,26 @@ check("non-string sourceId -> null", resolveSourceText(undefined), null);
   const r = scoreProvenance(segments);
   check("worked-example composed answer -> no hallucination risk", r.hallucinationRisk, false);
   check("worked-example -> has both archive and AI chars", r.archiveChars > 0 && r.aiChars > 0, true);
+}
+
+// --- refusal content must never be citable as archive material, even if
+// the quoted text is byte-for-byte real refusal text (a composed answer
+// citing a refusal as if it were approved archive content is itself a
+// fabrication, not a valid quote — refusals are never composed in the
+// first place) ---
+{
+  const r1 = REFUSAL_BANK.find((r) => r.id === "r1");
+  const segments = [{ type: "archive", text: r1.answer, sourceId: "r1", source: "refusal" }];
+  const r = scoreProvenance(segments);
+  check("citing a refusal entry as archive -> hallucination risk", r.hallucinationRisk, true);
+}
+// Same bug, different entry point: claiming source "refusal" for an id
+// that also happens to collide with nothing in QA/PROCESS should still
+// fail closed rather than silently resolving against the wrong bank.
+{
+  const segments = [{ type: "archive", text: "irrelevant", sourceId: "q2", source: "refusal" }];
+  const r = scoreProvenance(segments);
+  check("declared source \"refusal\" is rejected even for a real qa id", r.hallucinationRisk, true);
 }
 
 // --- one bad citation among otherwise-good ones still flags the whole answer ---
