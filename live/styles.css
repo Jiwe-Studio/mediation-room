@@ -479,6 +479,23 @@ footer.site-footer {
 }
 footer.site-footer button.btn-link { font-size: 0.78rem; }
 
+#dev-badge {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(20, 18, 15, 0.88);
+  color: #f4efe6;
+  font-family: "SF Mono", "Menlo", "Consolas", monospace;
+  font-size: 0.68rem;
+  line-height: 1.5;
+  padding: 0.5rem 0.7rem;
+  border-radius: 6px;
+  white-space: pre-line;
+  z-index: 100;
+  max-width: 280px;
+  pointer-events: none;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px; height: 1px;

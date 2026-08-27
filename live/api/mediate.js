@@ -69,6 +69,12 @@ module.exports = async (req, res) => {
       return;
     }
 
+    // Which underlying model actually served this — the preset has a
+    // fallback model, so this can differ request to request. Surfaced to
+    // the client only for the dev badge (test mode); not part of the
+    // output contract itself.
+    parsed.debugModel = data.model || null;
+
     res.status(200).json(parsed);
   } catch (e) {
     res.status(500).json({ error: e.message });

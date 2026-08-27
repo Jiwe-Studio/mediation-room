@@ -324,7 +324,9 @@ function getActiveVersion() {
 
 function setActiveVersion(v) {
   sessionStorage.setItem("mediationRoomVersion", v);
+  lastModelUsed = null; // stale once the engine changes
   renderVersionToggle();
+  renderDevBadge();
 }
 
 function renderVersionToggle() {
@@ -339,6 +341,45 @@ function renderVersionToggle() {
   $all(".version-btn", wrap).forEach((b) => {
     b.classList.toggle("active", b.dataset.version === active);
   });
+}
+
+// Preset slugs, kept here only for display — the actual values that matter
+// live server-side in api/mediate.js / api/mediate-v2.js and can't drift
+// from what's shown just because this label goes stale.
+const VERSION_PRESET_SLUGS = {
+  a: "@preset/mediation-room-voice",
+  b: "@preset/mediation-room-voice-v2-1",
+};
+
+// Set from a proxy response's debugModel field — the model that actually
+// served the last request (the preset has a fallback, so this can vary
+// request to request). Cleared whenever the engine changes since it would
+// otherwise show a stale reading from a different engine.
+let lastModelUsed = null;
+
+// Small floating corner readout (test mode only) of which engine is live
+// right now and, once a question's been asked, which underlying model
+// actually answered it — separate from the version-toggle buttons, which
+// do the actual switching; this just makes the current state visible
+// without scrolling back up to the chat header.
+function renderDevBadge() {
+  const badge = $("#dev-badge");
+  if (!badge) return;
+  if (!usePresetTestMode()) {
+    badge.style.display = "none";
+    return;
+  }
+  const version = getActiveVersion();
+  const lines = [];
+  if (version === "local") {
+    lines.push("engine: local matcher");
+  } else {
+    lines.push(`engine: version ${version}`);
+    lines.push(`preset: ${VERSION_PRESET_SLUGS[version] || "unknown"}`);
+    lines.push(`model: ${lastModelUsed || "(ask a question)"}`);
+  }
+  badge.textContent = lines.join("\n");
+  badge.style.display = "block";
 }
 
 function labelById(id) {
@@ -401,7 +442,9 @@ async function askQuestion(text) {
         throw new Error(body.error || `proxy responded ${res.status}`);
       }
       const json = await res.json();
+      if (json.debugModel) lastModelUsed = json.debugModel;
       addBotResponse(adaptPresetResult(json));
+      renderDevBadge();
     } catch (e) {
       console.error(`preset path (version ${version}) failed, falling back to local matcher:`, e);
       addBotResponse(respondTo(text));
@@ -462,6 +505,7 @@ function wireUp() {
     b.addEventListener("click", () => setActiveVersion(b.dataset.version));
   });
   renderVersionToggle();
+  renderDevBadge();
 
   renderStarterQuestions();
 
