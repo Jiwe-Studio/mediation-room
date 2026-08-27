@@ -10,7 +10,13 @@
 const ARCHIVE_SUMMARY_TEXT =
   "This history involves descent-based discrimination: people treated as lower-status — denied land, marriage, work, or a public voice — because of who their ancestors were, not anything they did themselves. These histories are often difficult to document because speaking openly can reopen the very stigma it describes. Silence may protect individuals, but it also makes the harm harder to understand, remember, or challenge.";
 
-const METHODOLOGY_TEXT = `This prototype was built by Jiwe Games for Thought with Donkosira, SOAS (Marie Rodet), and Code for Africa's AI Sandbox fellowship. Every piece of testimony in this demo is synthetic — written to test the interaction model, not drawn from a real witness. It is not a simulation of a real survivor, not a replacement for testimony or human facilitation, and not an oracle of historical truth. It exists to make visible how testimony changes as it moves through memory, research mediation, and AI mediation, and to test refusal rules and mediation labels before any real testimony is ever involved.`;
+// Single source of truth for the methodology note — rendered into BOTH
+// the entry screen's inline collapsible (#methodology-note-0) and the
+// modal reachable from every later screen's footer (#methodology-body).
+// These used to be two separately hand-maintained copies that had already
+// drifted to different wording and stale stage names; fixed by having
+// wireUp() set both from this one constant.
+const METHODOLOGY_TEXT = `This prototype was built by Jiwe Games for Thought with Donkosira, SOAS (Marie Rodet), and Code for Africa's AI Sandbox fellowship. Every piece of testimony in this demo is synthetic — written to test the interaction model, not drawn from a real witness. It is not a simulation of a real survivor, not a replacement for testimony or human facilitation, and not an oracle of historical truth. It exists to make visible how testimony changes as it moves through an interview, a translation and archiving process, and AI mediation — and to test refusal rules and mediation labels before any real testimony is ever involved.`;
 
 // "Lived Experience", "The Interview", and "The Translation" have no screen
 // behind them — on purpose. Clicking them opens an explanation instead of
@@ -487,6 +493,7 @@ function wireUp() {
   $all(".open-methodology").forEach((b) => b.addEventListener("click", toggleMethodologyModal));
   $("#methodology-modal-close").addEventListener("click", toggleMethodologyModal);
   $("#methodology-body").textContent = METHODOLOGY_TEXT;
+  $("#methodology-note-0").textContent = METHODOLOGY_TEXT;
 
   $all(".open-rules").forEach((b) => b.addEventListener("click", toggleRulesModal));
   $("#rules-modal-close").addEventListener("click", toggleRulesModal);
