@@ -23,12 +23,12 @@ const METHODOLOGY_TEXT = `This prototype was built by Jiwe Games for Thought wit
 // this particular prototype is sitting on.
 const LAYER_INFO = {
   lived: {
-    title: "Lived experience",
+    title: "Lived Experience",
     body: "This is the original moment itself — before memory, before language, before anyone else touches it. This prototype can't take you here directly, and that's deliberate: some things can't be retrieved, clicked into, or reproduced. Everything you can reach in this room is already at least one step removed from this. In this synthetic demo specifically, there is no real lived experience behind this layer either — it's shown so the full real-world pipeline stays honest about what any testimony work is built on top of, not because real content sits just out of reach here.",
   },
   memory: {
-    title: "Memory & narration",
-    body: "This is a person's own memory and telling of what happened — already shaped by time, by what they choose to share, and by who's listening. This prototype doesn't have direct access to this layer either. It only has what has already passed through research mediation and, on top of that, AI mediation. In this synthetic demo specifically, no interview or memory ever took place — this layer illustrates the real-world pipeline this design is meant for, not a real account being withheld from you.",
+    title: "Personal Memory",
+    body: "This is a person's own memory and telling of what happened — already shaped by time, by what they choose to share, and by who's listening. This prototype doesn't have direct access to this layer either. It only has what has already passed through the public archive and, on top of that, AI mediation. In this synthetic demo specifically, no interview or memory ever took place — this layer illustrates the real-world pipeline this design is meant for, not a real account being withheld from you.",
   },
 };
 
