@@ -479,6 +479,68 @@ footer.site-footer {
 }
 footer.site-footer button.btn-link { font-size: 0.78rem; }
 
+/* --- Avatar test step ("Held Fragments") — research step, see
+   BRIEF-avatar-test-step.md. Deliberately faceless: three soft, blurred
+   shapes echoing the app's own "holding fragments of experience" language,
+   not a mascot or a face. --- */
+.avatar-test-wrap { text-align: center; }
+.avatar-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4rem;
+  padding: 2.5rem 1rem 1.5rem;
+}
+.avatar-visual {
+  position: relative;
+  width: 160px;
+  height: 160px;
+}
+.avatar-visual .fragment {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(1px);
+  opacity: 0.85;
+  transition: transform 2.2s ease-in-out, opacity 2.2s ease-in-out, filter 2.2s ease-in-out;
+}
+.avatar-visual .f1 { width: 70px; height: 70px; background: var(--accent); top: 20px; left: 20px; }
+.avatar-visual .f2 { width: 52px; height: 52px; background: var(--accent-soft); top: 62px; left: 80px; }
+.avatar-visual .f3 { width: 40px; height: 40px; background: var(--chip-bg); top: 8px; left: 92px; }
+
+.avatar-visual[data-state="idle"] .f1 { animation: avatar-float 4s ease-in-out infinite; }
+.avatar-visual[data-state="idle"] .f2 { animation: avatar-float 4.6s ease-in-out infinite reverse; }
+.avatar-visual[data-state="idle"] .f3 { animation: avatar-float 5.2s ease-in-out infinite; }
+
+.avatar-visual[data-state="listening"] .fragment { animation: none; }
+.avatar-visual[data-state="listening"] .f1 { transform: translate(14px, 10px) scale(0.9); }
+.avatar-visual[data-state="listening"] .f2 { transform: translate(-10px, -8px) scale(0.9); }
+.avatar-visual[data-state="listening"] .f3 { transform: translate(-8px, 12px) scale(0.9); }
+
+.avatar-visual[data-state="speaking"] .fragment { animation: none; opacity: 1; }
+.avatar-visual[data-state="speaking"] .f1 { transform: translate(-8px, -6px) scale(1.15); }
+.avatar-visual[data-state="speaking"] .f2 { transform: translate(10px, 8px) scale(1.15); }
+.avatar-visual[data-state="speaking"] .f3 { transform: translate(6px, -10px) scale(1.15); }
+
+.avatar-visual[data-state="refusing"] .fragment {
+  animation: none;
+  opacity: 0.4;
+  filter: blur(2px) grayscale(0.5);
+}
+.avatar-visual[data-state="refusing"] .f1 { transform: translate(-20px, -14px) scale(0.8); }
+.avatar-visual[data-state="refusing"] .f2 { transform: translate(18px, 10px) scale(0.8); }
+.avatar-visual[data-state="refusing"] .f3 { transform: translate(4px, 18px) scale(0.8); }
+
+@keyframes avatar-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(4px, -6px) scale(1.03); }
+}
+
+.avatar-caption {
+  font-size: 1rem;
+  color: var(--ink-soft);
+  min-height: 1.4em;
+}
+
 #dev-badge {
   position: fixed;
   bottom: 12px;

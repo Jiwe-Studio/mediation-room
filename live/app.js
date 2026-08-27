@@ -120,6 +120,56 @@ function goToChatRoom() {
   }
 }
 
+// "Held Fragments" avatar test step (see BRIEF-avatar-test-step.md) — a
+// research step, not a shipped feature. Only reachable via a companion
+// flag, separate from ?preset, since testers should be able to try this
+// against the local matcher alone without also needing an LLM-backed
+// preset. Self-contained: doesn't touch chat-rendering code, safe to pull
+// back out entirely by reverting this block plus the screen-avatar markup.
+function useAvatarTestMode() {
+  return new URLSearchParams(window.location.search).has("avatar");
+}
+
+const AVATAR_SEQUENCE = [
+  { state: "idle", caption: "This is who you're about to talk to." },
+  { state: "listening", caption: "It listens for a question." },
+  { state: "speaking", caption: "And answers only from a small, fixed set of reviewed material." },
+  { state: "refusing", caption: "Some questions, it declines — on purpose." },
+];
+const AVATAR_STEP_MS = 4500;
+let avatarSequenceTimer = null;
+
+function playAvatarSequence() {
+  const visual = $("#avatar-visual");
+  const caption = $("#avatar-caption");
+  const continueBtn = $("#avatar-continue-btn");
+  if (!visual || !caption || !continueBtn) return;
+
+  if (avatarSequenceTimer) clearTimeout(avatarSequenceTimer);
+  continueBtn.style.display = "none";
+
+  let i = 0;
+  function step() {
+    const { state, caption: text } = AVATAR_SEQUENCE[i];
+    visual.dataset.state = state;
+    caption.textContent = text;
+    i++;
+    if (i < AVATAR_SEQUENCE.length) {
+      avatarSequenceTimer = setTimeout(step, AVATAR_STEP_MS);
+    } else {
+      avatarSequenceTimer = setTimeout(() => {
+        continueBtn.style.display = "inline-block";
+      }, AVATAR_STEP_MS);
+    }
+  }
+  step();
+}
+
+function goToAvatarTestScreen() {
+  showScreen("avatar");
+  playAvatarSequence();
+}
+
 function handleLayerClick(key) {
   if (key === "research") {
     showScreen(1);
@@ -498,7 +548,17 @@ function wireUp() {
   $all(".open-rules").forEach((b) => b.addEventListener("click", toggleRulesModal));
   $("#rules-modal-close").addEventListener("click", toggleRulesModal);
 
-  $("#enter-room-btn").addEventListener("click", goToChatRoom);
+  $("#enter-room-btn").addEventListener("click", () => {
+    if (useAvatarTestMode()) {
+      goToAvatarTestScreen();
+    } else {
+      goToChatRoom();
+    }
+  });
+  $("#avatar-continue-btn").addEventListener("click", () => {
+    if (avatarSequenceTimer) clearTimeout(avatarSequenceTimer);
+    goToChatRoom();
+  });
 
   $all(".back-btn").forEach((b) => {
     b.addEventListener("click", () => showScreen(Number(b.dataset.back)));

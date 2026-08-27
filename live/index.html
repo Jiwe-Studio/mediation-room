@@ -67,6 +67,27 @@
   </footer>
 </section>
 
+<!-- ===================== SCREEN "avatar" — Held Fragments test step =====================
+     Research step, not a shipped feature — see BRIEF-avatar-test-step.md. Only reachable
+     when ?avatar is in the URL (checked in app.js's useAvatarTestMode()); real visitors
+     never see this screen, and #enter-room-btn goes straight to the chat room as before.
+     Self-contained: no dependency on chat-rendering code, safe to pull back out. -->
+<section id="screen-avatar" class="screen" tabindex="-1">
+  <div class="wrap avatar-test-wrap">
+    <h2>Before you enter</h2>
+    <p class="subtitle">Who you're about to talk to.</p>
+    <div class="avatar-stage">
+      <div class="avatar-visual" id="avatar-visual" data-state="idle" aria-hidden="true">
+        <span class="fragment f1"></span>
+        <span class="fragment f2"></span>
+        <span class="fragment f3"></span>
+      </div>
+      <p class="avatar-caption" id="avatar-caption" aria-live="polite"></p>
+    </div>
+    <button class="btn-primary" id="avatar-continue-btn" style="display:none;">Continue to the room →</button>
+  </div>
+</section>
+
 <!-- ===================== SCREEN 2 — The Mediation Room (chat) ===================== -->
 <section id="screen-2" class="screen" tabindex="-1" style="min-height:100vh;">
   <div class="layer-bar">
