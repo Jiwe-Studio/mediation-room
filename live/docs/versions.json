@@ -1,0 +1,62 @@
+[
+  {
+    "id": "seed-prototype",
+    "tag": null,
+    "commit": "c52de2a",
+    "date": "2026-07-30",
+    "title": "Seed prototype",
+    "summary": "First working build: a static, client-side chatbot over a fixed, reviewed content bank. Disclaimer screen → public archive summary → chat with mediation labels and refusal handling → reflection close. No LLM, no server, no API keys.",
+    "llmConfig": "None. Free-text questions are matched against the approved answer bank via matcher.js's own TF-IDF + cosine-similarity retriever, running entirely in the browser.",
+    "ui": "Four-screen linear flow (disclaimer → archive summary → chat → reflection). Static layer-indicator breadcrumb (Lived experience → Memory & narration → Research mediation → AI mediation) — not yet clickable. Mediation-label chips on every answer. “See the mediation” toggle comparing a polished vs. rougher draft on select answers."
+  },
+  {
+    "id": "version-a-wiring",
+    "tag": null,
+    "commit": "44bd82e / 49a2cd7",
+    "date": "2026-08-07",
+    "title": "Full project structure + Version A OpenRouter wiring",
+    "summary": "Repo split into proper files (index.html, styles.css, matcher.js, app.js, test-matcher.js, docs/). Added a server-side proxy (api/mediate.js on Vercel) holding the OpenRouter API key, so an LLM-backed answer path could be tested without ever shipping the key to the browser.",
+    "llmConfig": "OpenRouter preset @preset/mediation-room-voice (Version A: retrieval-only). Primary model openai/gpt-oss-120b, fallback meta-llama/llama-4-maverick. System prompt generated from matcher.js's own content banks (generate-system-prompt.js) — not hand-written, so it can't drift from the local matcher's rules. Guardrail “basic guard rails”: budget cap, model allow-list, prompt-injection detection, sensitive-info redaction.",
+    "ui": "Gated behind a ?preset URL flag — real visitors still got the local matcher by default, per a private-test-first rollout plan. No visible UI change for normal visitors."
+  },
+  {
+    "id": "navigation-parity",
+    "tag": null,
+    "commit": "0ac6537",
+    "date": "2026-08-21",
+    "title": "Navigation parity restored",
+    "summary": "The live/ rebuild had silently dropped a feature the original single-file prototype already had: back buttons and a clickable layer breadcrumb. Ported forward rather than rebuilt from scratch.",
+    "llmConfig": "No change.",
+    "ui": "Every screen after the disclaimer gained a ← Back button and a clickable four-layer breadcrumb. “Research mediation” and “AI mediation” navigate to real screens; “Lived experience” and “Memory & narration” deliberately open a dead-end explanation modal instead — by design, not a missing feature: some layers genuinely can't be clicked into."
+  },
+  {
+    "id": "narrative-ux-overhaul",
+    "tag": null,
+    "commit": "0e637d9",
+    "date": "2026-08-22",
+    "title": "Narrative & safety-UX overhaul",
+    "summary": "Fixed a real matching bug (“what are you?” and bare greetings were structurally unmatchable — they tokenize to an empty word set under the stopword list). Made the refusal and rule-enforcement machinery visible rather than just claimed. Archive summary reworded from euphemistic to direct. test-matcher.js grew from 13 to 30 cases.",
+    "llmConfig": "REFUSAL_BANK entries gained a rationale field (why each rule exists — privacy, anti-voyeurism, anti-defamation, anti-impersonation), returned by the local matcher and folded into HARD_RULES, the single source of truth rendered into both the app's rules panel and the OpenRouter system prompt. Added GREETING_BANK and a self-identity trigger list to route around the tokenizer gap.",
+    "ui": "New “View the rules this AI follows” panel (same list injected into the AI's own prompt — nothing shown to users can drift from what's enforced). Every refusal now shows a “Why refused: …” line under the answer. noscript banner and static fallback text so nothing reads as broken while JS attaches."
+  },
+  {
+    "id": "version-b-added",
+    "tag": null,
+    "commit": "a6be8be",
+    "date": "2026-08-22",
+    "title": "Version B: composed answers with code-verified provenance",
+    "summary": "A second, parallel LLM-backed mode: instead of one verbatim bank entry per answer, the model may compose a short answer mixing its own connective sentences with word-for-word bank citations — but every citation is independently re-checked in code against the real bank text before ever reaching a user. The model's own claim about what's “archive” vs “AI” is never trusted as-is.",
+    "llmConfig": "New, separate OpenRouter preset (kept distinct from Version A on purpose, never an overwrite). provenance.js verifies every “archive” segment: whole-entry citations may be an exact substring of that entry's answer, sentence-level citations (e.g. q9:s2) must match that exact sentence. api/mediate-v2.js hard-gates on this — a composed answer with any citation that fails verification is never forwarded to the browser (502), not shown with a warning.",
+    "ui": "A version toggle (Local matcher / Version A / Version B) appeared in the chat header, visible only in ?preset test mode, letting both LLM-backed modes stay live simultaneously with the tester picking per session — rather than one flag silently deciding. Composed answers render each segment with its source citation and a “Archive X% / AI Y% (code-verified)” badge."
+  },
+  {
+    "id": "version-b-verified",
+    "tag": "version-b-verified-2026-08-22",
+    "commit": "23876fa / 91fd379",
+    "date": "2026-08-23",
+    "title": "Version B verified — current baseline",
+    "summary": "Two real bugs found via live testing, both fixed: (1) some model outputs leak raw chat-template tokens ahead of the JSON body, which markdown-fence stripping didn't catch — fixed by extracting the outermost {…} span; (2) Version B's own “rules shown to users” text quoted literal jailbreak phrases (‘developer mode’, ‘ignore previous instructions’) as examples, which made OpenRouter's own guardrail block every request, not just adversarial ones — reworded generically. Also fixed an off-by-one in the prompt's own worked example that had taught the model to mis-cite a sentence.",
+    "llmConfig": "Both @preset/mediation-room-voice (Version A) and @preset/mediation-room-voice-v2-1 (Version B) live on OpenRouter, each proxied through its own Vercel route. test-preset.js and test-preset-v2.js both at 27/27 real passes against the live API (excluding OpenRouter's own guardrail correctly blocking 3 adversarial jailbreak phrasings pre-model — expected, not a defect).",
+    "ui": "No UI change from the previous entry — this milestone is about the LLM-side fixes and end-to-end verification, not the interface."
+  }
+]

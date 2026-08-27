@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Mediation Room — Version History</title>
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  .versions-wrap { max-width: 780px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  .versions-header { margin-bottom: 2rem; }
+  .versions-back { font-size: 0.9rem; }
+  .version-card {
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--accent);
+    border-radius: 6px;
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 1.4rem;
+    background: #fffdf8;
+  }
+  .version-card.current { border-left-color: #3d7a4a; background: #f3f8f4; }
+  .version-title-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+  .version-title { font-size: 1.05rem; font-weight: 600; margin: 0; }
+  .version-date { font-size: 0.8rem; color: var(--ink-soft); white-space: nowrap; }
+  .version-meta { font-size: 0.75rem; color: var(--ink-soft); margin-top: 0.15rem; }
+  .current-badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: #3d7a4a;
+    color: #fff;
+    border-radius: 10px;
+    padding: 0.1rem 0.55rem;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+  }
+  .version-section { margin-top: 0.8rem; }
+  .version-section h4 {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    margin: 0 0 0.25rem;
+  }
+  .version-section p { margin: 0; font-size: 0.92rem; }
+  #versions-loading, #versions-error { color: var(--ink-soft); font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<div class="versions-wrap">
+  <div class="versions-header">
+    <a class="btn-link versions-back" href="/">← Back to the room</a>
+    <h1 style="margin-top:0.8rem;">Version History</h1>
+    <p class="subtitle">What each build accomplished, generated from the project's own commit history — not maintained by hand as a separate summary.</p>
+  </div>
+  <div id="versions-loading">Loading version history…</div>
+  <div id="versions-error" style="display:none;">Could not load version history (docs/versions.json).</div>
+  <div id="versions-list"></div>
+</div>
+
+<script>
+  async function loadVersions() {
+    const loading = document.getElementById("versions-loading");
+    const errorEl = document.getElementById("versions-error");
+    const list = document.getElementById("versions-list");
+    try {
+      const res = await fetch("../docs/versions.json");
+      if (!res.ok) throw new Error("fetch failed: " + res.status);
+      const versions = await res.json();
+      loading.style.display = "none";
+      versions.slice().reverse().forEach((v, i) => {
+        const isCurrent = i === 0;
+        const card = document.createElement("div");
+        card.className = "version-card" + (isCurrent ? " current" : "");
+
+        const titleRow = document.createElement("div");
+        titleRow.className = "version-title-row";
+        const title = document.createElement("h3");
+        title.className = "version-title";
+        title.textContent = v.title;
+        if (isCurrent) {
+          const badge = document.createElement("span");
+          badge.className = "current-badge";
+          badge.textContent = "Current";
+          title.appendChild(badge);
+        }
+        const date = document.createElement("span");
+        date.className = "version-date";
+        date.textContent = v.date;
+        titleRow.appendChild(title);
+        titleRow.appendChild(date);
+        card.appendChild(titleRow);
+
+        const meta = document.createElement("div");
+        meta.className = "version-meta";
+        meta.textContent = (v.tag ? `tag: ${v.tag} · ` : "") + `commit ${v.commit}`;
+        card.appendChild(meta);
+
+        [
+          ["Summary", v.summary],
+          ["LLM config", v.llmConfig],
+          ["UI / UX", v.ui],
+        ].forEach(([label, text]) => {
+          if (!text) return;
+          const section = document.createElement("div");
+          section.className = "version-section";
+          const h4 = document.createElement("h4");
+          h4.textContent = label;
+          const p = document.createElement("p");
+          p.textContent = text;
+          section.appendChild(h4);
+          section.appendChild(p);
+          card.appendChild(section);
+        });
+
+        list.appendChild(card);
+      });
+    } catch (e) {
+      loading.style.display = "none";
+      errorEl.style.display = "block";
+      console.error(e);
+    }
+  }
+  document.addEventListener("DOMContentLoaded", loadVersions);
+</script>
+</body>
+</html>
